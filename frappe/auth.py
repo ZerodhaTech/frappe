@@ -141,7 +141,10 @@ class LoginManager:
 	def get_user_info(self, resume=False):
 		self.info = frappe.db.get_value("User", self.user,
 			["user_type", "first_name", "last_name", "user_image"], as_dict=1)
+<<<<<<< 7666a58c81e8e326ddf0b2f0c74fb4931d20670b
 
+=======
+>>>>>>> Redirect to desk if user has active session
 		self.user_type = self.info.user_type
 
 	def set_user_info(self, resume=False):
@@ -150,6 +153,10 @@ class LoginManager:
 
 		self.full_name = " ".join(filter(None, [self.info.first_name,
 			self.info.last_name]))
+<<<<<<< 7666a58c81e8e326ddf0b2f0c74fb4931d20670b
+=======
+
+>>>>>>> Redirect to desk if user has active session
 
 		if self.info.user_type=="Website User":
 			frappe.local.cookie_manager.set_cookie("system_user", "no")
@@ -178,6 +185,7 @@ class LoginManager:
 
 	def make_session(self, resume=False):
 		# start session
+		self.user_type="System User"
 		frappe.local.session_obj = Session(user=self.user, resume=resume,
 			full_name=self.full_name, user_type=self.user_type)
 
