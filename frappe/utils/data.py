@@ -254,10 +254,10 @@ def format_datetime(datetime_string, format_string=None):
 		formatted_datetime = datetime.strftime('%Y-%m-%d %H:%M:%S')
 	return formatted_datetime
 
-def global_date_format(date):
+def global_date_format(date, format="long"):
 	"""returns localized date in the form of January 1, 2012"""
 	date = getdate(date)
-	formatted_date = babel.dates.format_date(date, locale=(frappe.local.lang or "en").replace("-", "_"), format="long")
+	formatted_date = babel.dates.format_date(date, locale=(frappe.local.lang or "en").replace("-", "_"), format=format)
 	return formatted_date
 
 def has_common(l1, l2):
@@ -385,7 +385,7 @@ def fmt_money(amount, precision=None, currency=None):
 			elif len(decimals) < precision:
 				precision = len(decimals)
 
-	amount = '%.*f' % (precision, flt(amount))
+	amount = '%.*f' % (precision, round(flt(amount), precision))
 	if amount.find('.') == -1:
 		decimals = ''
 	else:

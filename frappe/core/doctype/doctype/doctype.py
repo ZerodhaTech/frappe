@@ -3,6 +3,8 @@
 
 from __future__ import unicode_literals
 
+import six
+
 import re, copy, os
 import frappe
 from frappe import _
@@ -14,6 +16,7 @@ from frappe.custom.doctype.property_setter.property_setter import make_property_
 from frappe.desk.notifications import delete_notification_count_for
 from frappe.modules import make_boilerplate
 from frappe.model.db_schema import validate_column_name, validate_column_length
+from frappe.model.docfield import supports_translation
 import frappe.website.render
 
 # imports - third-party imports
@@ -54,6 +57,7 @@ class DocType(Document):
 
 		self.scrub_field_names()
 		self.set_default_in_list_view()
+		self.set_default_translatable()
 		self.validate_series()
 		self.validate_document_type()
 		validate_fields(self)
@@ -85,6 +89,12 @@ class DocType(Document):
 					d.in_list_view = 1
 					cnt += 1
 					if cnt == 4: break
+
+	def set_default_translatable(self):
+		'''Ensure that non-translatable never will be translatable'''
+		for d in self.fields:
+			if d.translatable and not supports_translation(d.fieldtype):
+				d.translatable = 0
 
 	def check_developer_mode(self):
 		"""Throw exception if not developer mode or via patch"""
@@ -144,7 +154,7 @@ class DocType(Document):
 		if self.has_web_view:
 			# route field must be present
 			if not 'route' in [d.fieldname for d in self.fields]:
-				frappe.throw('Field "route" is mandatory for Web Views', title='Missing Field')
+				frappe.throw(_('Field "route" is mandatory for Web Views'), title='Missing Field')
 
 			# clear website cache
 			frappe.website.render.clear_cache()
@@ -381,7 +391,10 @@ class DocType(Document):
 
 		# a DocType's name should not start with a number or underscore
 		# and should only contain letters, numbers and underscore
-		is_a_valid_name = re.match("^(?![\W])[^\d_\s][\w -]+$", name, re.UNICODE)
+		if six.PY2:
+			is_a_valid_name = re.match("^(?![\W])[^\d_\s][\w -]+$", name)
+		else:
+			is_a_valid_name = re.match("^(?![\W])[^\d_\s][\w -]+$", name, flags = re.ASCII)
 		if not is_a_valid_name:
 			frappe.throw(_("DocType's name should start with a letter and it can only consist of letters, numbers, spaces and underscores"), frappe.NameError)
 
