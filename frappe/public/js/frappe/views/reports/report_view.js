@@ -1,11 +1,14 @@
 /**
  * frappe.views.ReportView
  */
+import DataTable from 'frappe-datatable';
+
 frappe.provide('frappe.views');
 
 frappe.views.ReportView = class ReportView extends frappe.views.ListView {
 	setup_defaults() {
 		super.setup_defaults();
+		this.view_name = 'Report';
 		this.page_title = __('Report:') + ' ' + this.page_title;
 		this.menu_items = this.report_menu_items();
 
@@ -142,11 +145,9 @@ frappe.views.ReportView = class ReportView extends frappe.views.ListView {
 
 	setup_datatable(values) {
 		this.datatable = new DataTable(this.$datatable_wrapper[0], {
+			columns: this.columns,
 			data: this.get_data(values),
-			enableClusterize: true,
-			addCheckbox: this.can_delete,
-			takeAvailableSpace: true,
-			editing: this.get_editing_object.bind(this),
+			getEditor: this.get_editing_object.bind(this),
 			events: {
 				onRemoveColumn: (column) => {
 					this.remove_column_from_datatable(column);
@@ -276,8 +277,7 @@ frappe.views.ReportView = class ReportView extends frappe.views.ListView {
 				const get_df = (field) => frappe.meta.get_docfield(this.doctype, field);
 				const get_doc = (value, field) => this.data.find(d => d[field] === value);
 
-				this.chart = new Chart({
-					parent: this.$charts_wrapper[0],
+				this.chart = new Chart(this.$charts_wrapper[0], {
 					title: __("{0} Chart", [this.doctype]),
 					data: data,
 					type: args.chart_type, // 'bar', 'line', 'scatter', 'pie', 'percentage'
@@ -385,7 +385,7 @@ frappe.views.ReportView = class ReportView extends frappe.views.ListView {
 			y_fields: y_axes,
 			labels: labels,
 			datasets: y_axes.map(y_axis => ({
-				title: frappe.meta.get_docfield(this.doctype, y_axis).label,
+				name: frappe.meta.get_docfield(this.doctype, y_axis).label,
 				values: this.data.map(d => ({
 					doc: d,
 					field: y_axis,
@@ -489,10 +489,7 @@ frappe.views.ReportView = class ReportView extends frappe.views.ListView {
 	}
 
 	get_data(values) {
-		return {
-			columns: this.columns,
-			rows: this.build_rows(values)
-		};
+		return this.build_rows(values);
 	}
 
 	set_fields() {
@@ -740,7 +737,7 @@ frappe.views.ReportView = class ReportView extends frappe.views.ListView {
 			docfield: docfield,
 			name: title,
 			content: title,
-			width: (docfield ? cint(docfield.width) : 120) || 120,
+			width: (docfield ? cint(docfield.width) : null) || null,
 			editable: editable
 		};
 	}

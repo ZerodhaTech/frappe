@@ -3,7 +3,6 @@ frappe.provide('frappe.views');
 frappe.views.BaseList = class BaseList {
 	constructor(opts) {
 		Object.assign(this, opts);
-		this.show();
 	}
 
 	show() {
@@ -20,7 +19,6 @@ frappe.views.BaseList = class BaseList {
 			this.setup_fields,
 			// make view
 			this.setup_page,
-			this.setup_page_head,
 			this.setup_side_bar,
 			this.setup_main_section,
 			this.setup_view,
@@ -43,7 +41,6 @@ frappe.views.BaseList = class BaseList {
 		this.method = 'frappe.desk.reportview.get';
 
 		this.can_create = frappe.model.can_create(this.doctype);
-		this.can_delete = frappe.model.can_delete(this.doctype);
 		this.can_write = frappe.model.can_write(this.doctype);
 
 		this.fields = [];
@@ -140,10 +137,10 @@ frappe.views.BaseList = class BaseList {
 	}
 
 	setup_page() {
-		this.parent.list_view = this;
 		this.page = this.parent.page;
 		this.$page = $(this.parent);
 		this.page.page_form.removeClass('row').addClass('flex');
+		this.setup_page_head();
 	}
 
 	setup_page_head() {
@@ -165,9 +162,12 @@ frappe.views.BaseList = class BaseList {
 		}
 
 		this.menu_items.map(item => {
+			if (item.condition && item.condition() === false) {
+				return;
+			}
 			const $item = this.page.add_menu_item(item.label, item.action, item.standard);
 			if (item.class) {
-				$item.addClass(item.class);
+				$item && $item.addClass(item.class);
 			}
 		});
 	}
@@ -330,14 +330,16 @@ frappe.views.BaseList = class BaseList {
 		return frappe.call({
 			method: this.method,
 			type: 'GET',
-			args: args
+			args: args,
+			freeze: this.freeze_on_refresh || false,
+			freeze_message: this.freeze_message || (__('Loading') + '...')
 		}).then(r => {
 			// render
-			this.freeze(false);
 			this.prepare_data(r);
 			this.toggle_result_area();
 			this.before_render();
 			this.render();
+			this.freeze(false);
 		});
 	}
 
@@ -519,11 +521,13 @@ class FilterArea {
 	clear() {
 		this.filter_list.clear_filters();
 
+		const promises = [];
 		const fields_dict = this.list_view.page.fields_dict;
 		for (let key in fields_dict) {
 			const field = this.list_view.page.fields_dict[key];
-			field.set_value('');
+			promises.push(() => field.set_value(''));
 		}
+		return frappe.run_serially(promises);
 	}
 
 	make_standard_filters() {
@@ -553,7 +557,7 @@ class FilterArea {
 		if(this.list_view.custom_filter_configs) {
 			this.list_view.custom_filter_configs.forEach(config => {
 				config.onchange = () => this.refresh_list_view();
-			})
+			});
 
 			fields = fields.concat(this.list_view.custom_filter_configs);
 		}
