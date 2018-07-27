@@ -83,7 +83,7 @@ class Database:
 				charset='utf8mb4', use_unicode = True, ssl=self.ssl, conv = conversions)
 		else:
 			self._conn = pymysql.connect(self.host, self.user or '', self.password or '',
-				charset='utf8mb4', use_unicode = True, conv = conversions)
+				charset='utf8mb4', use_unicode = True, conv = conversions, local_infile=1)
 
 		# MYSQL_OPTION_MULTI_STATEMENTS_OFF = 1
 		# # self._conn.set_server_option(MYSQL_OPTION_MULTI_STATEMENTS_OFF)
