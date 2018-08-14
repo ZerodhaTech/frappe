@@ -11,16 +11,25 @@ from frappe.model.db_query import DatabaseQuery
 from frappe import _
 from six import text_type, string_types, StringIO
 
+
 # imports - third-party imports
 import pymysql
 
+@frappe.profile
+def profileget():
+        args = get_form_params()
+
+        data = compress(execute(**args), args = args)
+
+        return data
+
 @frappe.whitelist()
 def get():
-	args = get_form_params()
+	# args = get_form_params()
 
-	data = compress(execute(**args), args = args)
+	# data = compress(execute(**args), args = args)
 
-	return data
+	return profileget()
 
 def execute(doctype, *args, **kwargs):
 	return DatabaseQuery(doctype).execute(*args, **kwargs)

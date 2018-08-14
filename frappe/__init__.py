@@ -9,6 +9,7 @@ from __future__ import unicode_literals, print_function
 from six import iteritems, binary_type, text_type, string_types
 from werkzeug.local import Local, release_local
 import os, sys, importlib, inspect, json
+import cProfile
 
 # public
 from .exceptions import *
@@ -359,6 +360,23 @@ def get_user():
 	if not local.user_perms:
 		local.user_perms = UserPermissions(local.session.user)
 	return local.user_perms
+
+def profile(func):
+    def profiled_func(*args, **kwargs):
+        profile = cProfile.Profile()
+        try:
+            directory = '../profile'
+
+            if not os.path.exists(directory):
+                os.makedirs(directory)
+
+            profile.enable()
+            result = func(*args, **kwargs)
+            profile.disable()
+            return result
+        finally:
+            profile.dump_stats("../profile/" + str(func.__name__) + ".prof")
+    return profiled_func
 
 def get_roles(username=None):
 	"""Returns roles of current user."""
