@@ -41,6 +41,9 @@ class PostgresTable(DBTable):
 
 		for col in self.change_type:
 			using_clause = ""
+			if col.fieldtype == "JSON":
+				using_clause = "USING {}::jsonb".format(col.fieldname)
+
 			if col.fieldtype in ("Datetime"):
 				# The USING option of SET DATA TYPE can actually specify any expression
 				# involving the old values of the row
