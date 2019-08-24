@@ -34,15 +34,16 @@ data_fieldtypes = (
 	'Signature',
 	'Color',
 	'Barcode',
-	'Geolocation'
+	'Geolocation',
+	'JSON'
 )
 
 no_value_fields = ('Section Break', 'Column Break', 'HTML', 'Table', 'Table MultiSelect', 'Button', 'Image',
 	'Fold', 'Heading')
 display_fieldtypes = ('Section Break', 'Column Break', 'HTML', 'Button', 'Image', 'Fold', 'Heading')
 numeric_fieldtypes = ('Currency', 'Int', 'Long Int', 'Float', 'Percent', 'Check')
-default_fields = ('doctype','name','owner','creation','modified','modified_by',
-	'parent','parentfield','parenttype','idx','docstatus')
+default_fields = ('doctype', 'name', 'owner', 'creation', 'modified', 'modified_by',
+	'parent', 'parentfield', 'parenttype', 'idx', 'docstatus')
 optional_fields = ("_user_tags", "_comments", "_assign", "_liked_by", "_seen")
 table_fields = ('Table', 'Table MultiSelect')
 core_doctypes_list = ('DocType', 'DocField', 'DocPerm', 'User', 'Role', 'Has Role',
