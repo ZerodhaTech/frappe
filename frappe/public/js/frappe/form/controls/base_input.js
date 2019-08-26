@@ -116,6 +116,8 @@ frappe.ui.form.ControlInput = frappe.ui.form.Control.extend({
 			&& (this.value === 0 || value === 0)) {
 			// to set the 0 value in readonly for currency, int, float field
 			value = 0;
+		} else if(this.df.fieldtype == "JSON") {
+			value = JSON.stringify((this.value || value), undefined, 4);
 		} else {
 			value = this.value || value;
 		}
