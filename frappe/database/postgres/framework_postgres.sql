@@ -59,9 +59,9 @@ CREATE TABLE "tabDocField" (
 ) ;
 
 create index on "tabDocField" ("parent");
-create index on "tabDocField" ("label");
-create index on "tabDocField" ("fieldtype");
-create index on "tabDocField" ("fieldname");
+-- create index on "tabDocField" ("label");
+-- create index on "tabDocField" ("fieldtype");
+-- create index on "tabDocField" ("fieldname");
 
 --
 -- Table structure for table "tabDocPerm"
@@ -248,8 +248,8 @@ CREATE TABLE "tabFile" (
 );
 
 create index on "tabFile" ("parent");
-create index on "tabFile" ("attached_to_name");
-create index on "tabFile" ("attached_to_doctype");
+-- create index on "tabFile" ("attached_to_name");
+-- create index on "tabFile" ("attached_to_doctype");
 
 --
 -- Table structure for table "tabDefaultValue"
