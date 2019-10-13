@@ -130,6 +130,11 @@ class Document(BaseDocument):
 	def load_from_db(self):
 		"""Load document and children from database and create properties
 		from fields"""
+
+		# Do not load from DB for Virtual doctypes
+		if(frappe.db.get_value("DocType", self.doctype,("virtual"), cache=True)):
+			return
+
 		if not getattr(self, "_metaclass", False) and self.meta.issingle:
 			single_doc = frappe.db.get_singles_dict(self.doctype)
 			if not single_doc:

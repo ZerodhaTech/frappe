@@ -218,6 +218,9 @@ class PostgresDatabase(Database):
 		res = self.sql("select issingle from `tabDocType` where name='{}'".format(doctype))
 		if not res:
 			raise Exception('Wrong doctype {0} in updatedb'.format(doctype))
+		
+		# Do not update db, if doctype is virtual
+		res = self.sql("select virtual from `tabDocType` where name='{}'".format(doctype))
 
 		if not res[0][0]:
 			db_table = PostgresTable(doctype, meta)

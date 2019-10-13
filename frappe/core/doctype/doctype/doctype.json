@@ -20,6 +20,7 @@
   "track_views",
   "custom",
   "beta",
+  "virtual",
   "fields_section_break",
   "fields",
   "sb1",
@@ -438,11 +439,17 @@
    "fieldtype": "Select",
    "label": "Database Engine",
    "options": "InnoDB\nMyISAM"
+  },
+  {
+   "default": "0",
+   "fieldname": "virtual",
+   "fieldtype": "Check",
+   "label": "Virtual"
   }
  ],
  "icon": "fa fa-bolt",
  "idx": 6,
- "modified": "2019-07-04 23:23:17.174960",
+ "modified": "2019-10-12 08:02:15.137584",
  "modified_by": "Administrator",
  "module": "Core",
  "name": "DocType",

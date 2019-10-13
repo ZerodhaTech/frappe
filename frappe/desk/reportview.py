@@ -11,6 +11,7 @@ from frappe.model.db_query import DatabaseQuery
 from frappe import _
 from six import text_type, string_types, StringIO
 from frappe.core.doctype.access_log.access_log import make_access_log
+from frappe.model.base_document import get_controller
 
 @frappe.whitelist()
 @frappe.read_only()
@@ -22,7 +23,12 @@ def get():
 	return data
 
 def execute(doctype, *args, **kwargs):
-	return DatabaseQuery(doctype).execute(*args, **kwargs)
+	is_doctype_virtual = frappe.db.get_value("DocType", doctype,("virtual"), cache=True)
+	if(is_doctype_virtual):
+		virtual_doc = get_controller(doctype)
+		return virtual_doc(doctype).execute(*args, **kwargs)
+	else:
+		return DatabaseQuery(doctype).execute(*args, **kwargs)
 
 def get_form_params():
 	"""Stringify GET request parameters."""
