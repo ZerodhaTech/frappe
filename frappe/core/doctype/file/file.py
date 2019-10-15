@@ -287,7 +287,7 @@ class File(NestedSet):
 
 	def on_rollback(self):
 		self.flags.on_rollback = True
-		self.on_trash()
+		# self.on_trash()
 
 	def unzip(self):
 		'''Unzip current file and replace it by its children'''
