@@ -2,7 +2,7 @@ import frappe, subprocess, os
 from six.moves import input
 
 def setup_database(force, source_sql, verbose):
-	root_conn = get_root_connection()
+	root_conn = get_root_connection(frappe.flags.root_login, frappe.flags.root_password)
 	root_conn.commit()
 	root_conn.sql("DROP DATABASE IF EXISTS `{0}`".format(frappe.conf.db_name))
 	root_conn.sql("DROP USER IF EXISTS {0}".format(frappe.conf.db_name))
