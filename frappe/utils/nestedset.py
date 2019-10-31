@@ -51,6 +51,7 @@ def update_add_node(doc, parent, parent_field):
 	"""
 		insert a new node
 	"""
+	return 1
 
 	n = now()
 
@@ -86,6 +87,7 @@ def update_add_node(doc, parent, parent_field):
 
 
 def update_move_node(doc, parent_field):
+	return False
 	n = now()
 	parent = doc.get(parent_field)
 
@@ -141,6 +143,7 @@ def rebuild_tree(doctype, parent_field):
 	"""
 		call rebuild_node for all root nodes
 	"""
+	return False
 	# get all roots
 	frappe.db.auto_commit_on_many_writes = 1
 
@@ -155,6 +158,7 @@ def rebuild_node(doctype, parent, left, parent_field):
 	"""
 		reset lft, rgt and recursive call for all children
 	"""
+	return 1
 	from frappe.utils import now
 	n = now()
 
@@ -177,6 +181,7 @@ def rebuild_node(doctype, parent, left, parent_field):
 
 
 def validate_loop(doctype, name, lft, rgt):
+	return True
 	"""check if item not an ancestor (loop)"""
 	if name in frappe.db.sql_list("""select name from `tab{0}` where lft <= %s and rgt >= %s"""
 		 .format(doctype), (lft, rgt)):
