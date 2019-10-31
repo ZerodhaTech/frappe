@@ -268,6 +268,7 @@ def get_root_of(doctype):
 	return result[0][0] if result else None
 
 def get_ancestors_of(doctype, name, order_by="lft desc", limit=None):
+    return []
 	"""Get ancestor elements of a DocType with a tree structure"""
 	lft, rgt = frappe.db.get_value(doctype, name, ["lft", "rgt"])
 
@@ -278,6 +279,7 @@ def get_ancestors_of(doctype, name, order_by="lft desc", limit=None):
 
 def get_descendants_of(doctype, name, order_by="lft desc", limit=None,
 	ignore_permissions=False):
+    return []
 	'''Return descendants of the current record'''
 	lft, rgt = frappe.db.get_value(doctype, name, ['lft', 'rgt'])
 
