@@ -13,8 +13,8 @@ from six import text_type
 @click.argument('site')
 @click.option('--db-name', help='Database name')
 @click.option('--db-type', default='mariadb', type=click.Choice(['mariadb', 'postgres']), help='Optional "postgres" or "mariadb". Default is "mariadb"')
-@click.option('--db-root-username', default='root', help='Root username for MariaDB')
-@click.option('--db-root-password', help='Root password for MariaDB')
+@click.option('--db-root-username', default='root', help='Root/ Superuser username')
+@click.option('--db-root-password', help='Root/ Superuser password')
 @click.option('--admin-password', help='Administrator password for new site', default=None)
 @click.option('--verbose', is_flag=True, default=False, help='Verbose')
 @click.option('--force', help='Force restore if site/database already exists', is_flag=True, default=False)
@@ -89,15 +89,15 @@ def _new_site(db_name, site, db_root_username=None, db_root_password=None,
 
 @click.command('restore')
 @click.argument('sql-file-path')
-@click.option('--mariadb-root-username', default='root', help='Root username for MariaDB')
-@click.option('--mariadb-root-password', help='Root password for MariaDB')
+@click.option('--db-root-username', default='root', help='Root/ Superuser username')
+@click.option('--db-root-password', help='Root/ Superuser password')
 @click.option('--db-name', help='Database name for site in case it is a new one')
 @click.option('--admin-password', help='Administrator password for new site')
 @click.option('--install-app', multiple=True, help='Install app after installation')
 @click.option('--with-public-files', help='Restores the public files of the site, given path to its tar file')
 @click.option('--with-private-files', help='Restores the private files of the site, given path to its tar file')
 @pass_context
-def restore(context, sql_file_path, mariadb_root_username=None, mariadb_root_password=None, db_name=None, verbose=None, install_app=None, admin_password=None, force=None, with_public_files=None, with_private_files=None):
+def restore(context, sql_file_path, db_root_username=None, db_root_password=None, db_name=None, verbose=None, install_app=None, admin_password=None, force=None, with_public_files=None, with_private_files=None):
 	"Restore site database from an sql file"
 	from frappe.installer import extract_sql_gzip, extract_tar_files
 	# Extract the gzip file if user has passed *.sql.gz file instead of *.sql file
@@ -113,8 +113,8 @@ def restore(context, sql_file_path, mariadb_root_username=None, mariadb_root_pas
 
 	site = get_site(context)
 	frappe.init(site=site)
-	_new_site(frappe.conf.db_name, site, mariadb_root_username=mariadb_root_username,
-		mariadb_root_password=mariadb_root_password, admin_password=admin_password,
+	_new_site(frappe.conf.db_name, site, db_root_username=db_root_username,
+		db_root_password=db_root_password, admin_password=admin_password,
 		verbose=context.verbose, install_apps=install_app, source_sql=sql_file_path,
 		force=context.force)
 
@@ -129,16 +129,16 @@ def restore(context, sql_file_path, mariadb_root_username=None, mariadb_root_pas
 
 @click.command('reinstall')
 @click.option('--admin-password', help='Administrator Password for reinstalled site')
-@click.option('--mariadb-root-username', help='Root username for MariaDB')
-@click.option('--mariadb-root-password', help='Root password for MariaDB')
+@click.option('--db-root-username', help='Root/ Superuser username')
+@click.option('--db-root-password', help='Root/ Superuser password')
 @click.option('--yes', is_flag=True, default=False, help='Pass --yes to skip confirmation')
 @pass_context
-def reinstall(context, admin_password=None, mariadb_root_username=None, mariadb_root_password=None, yes=False):
+def reinstall(context, admin_password=None, db_root_username=None, db_root_password=None, yes=False):
 	"Reinstall site ie. wipe all data and start over"
 	site = get_site(context)
-	_reinstall(site, admin_password, mariadb_root_username, mariadb_root_password, yes, verbose=context.verbose)
+	_reinstall(site, admin_password, db_root_username, db_root_password, yes, verbose=context.verbose)
 
-def _reinstall(site, admin_password=None, mariadb_root_username=None, mariadb_root_password=None, yes=False, verbose=False):
+def _reinstall(site, admin_password=None, db_root_username=None, db_root_password=None, yes=False, verbose=False):
 	if not yes:
 		click.confirm('This will wipe your database. Are you sure you want to reinstall?', abort=True)
 	try:
@@ -156,7 +156,7 @@ def _reinstall(site, admin_password=None, mariadb_root_username=None, mariadb_ro
 
 	frappe.init(site=site)
 	_new_site(frappe.conf.db_name, site, verbose=verbose, force=True, reinstall=True, install_apps=installed,
-		mariadb_root_username=mariadb_root_username, mariadb_root_password=mariadb_root_password,
+		db_root_username=db_root_username, db_root_password=db_root_password,
 		admin_password=admin_password)
 
 @click.command('install-app')
