@@ -12,7 +12,7 @@ from frappe.utils import cint
 from werkzeug.wrappers import Response
 from six import string_types
 
-def handle():
+def handle(args=[]):
 	"""handle request"""
 	cmd = frappe.local.form_dict.cmd
 	data = None
@@ -22,7 +22,7 @@ def handle():
 		frappe.call(get_attr(before_request_cmd), **frappe.form_dict)
 
 	if cmd!='login':
-		data = execute_cmd(cmd)
+		data = execute_cmd(cmd, args=args)
 
 	after_request = frappe.get_hooks("after_whitelisted_method", [])
 	for after_request_cmd in after_request:
@@ -39,7 +39,7 @@ def handle():
 
 	return build_response("json")
 
-def execute_cmd(cmd, from_async=False):
+def execute_cmd(cmd, args=[], from_async=False):
 	"""execute a request as python module"""
 	for hook in frappe.get_hooks("override_whitelisted_methods", {}).get(cmd, []):
 		# override using the first hook
@@ -61,7 +61,7 @@ def execute_cmd(cmd, from_async=False):
 
 	is_whitelisted(method)
 
-	return frappe.call(method, **frappe.form_dict)
+	return frappe.call(method, *args, **frappe.form_dict)
 
 
 def is_whitelisted(method):
@@ -188,10 +188,10 @@ def upload_file():
 		return ret
 
 
-def get_attr(cmd):
+def get_attr(cmd, args=[]):
 	"""get method object from cmd"""
 	if '.' in cmd:
-		method = frappe.get_attr(cmd)
+		method = frappe.get_attr(cmd, args)
 	else:
 		method = globals()[cmd]
 	frappe.log("method:" + cmd)

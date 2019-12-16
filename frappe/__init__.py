@@ -1016,7 +1016,7 @@ def read_file(path, raise_not_found=False):
 	else:
 		return None
 
-def get_attr(method_string):
+def get_attr(method_string, args=[]):
 	"""Get python method object from its name."""
 	app_name = method_string.split(".")[0]
 	if not local.flags.in_install and app_name not in get_installed_apps():
@@ -1024,7 +1024,11 @@ def get_attr(method_string):
 
 	modulename = '.'.join(method_string.split('.')[:-1])
 	methodname = method_string.split('.')[-1]
-	return getattr(get_module(modulename), methodname)
+	if args:
+		method = getattr(get_module(modulename), methodname)(args)
+	else:
+		method = getattr(get_module(modulename), methodname)
+	return method
 
 def call(fn, *args, **kwargs):
 	"""Call a function and match arguments."""
