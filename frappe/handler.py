@@ -12,7 +12,7 @@ from frappe.utils import cint
 from werkzeug.wrappers import Response
 from six import string_types
 
-def handle(args=[]):
+def handle(args=None):
 	"""handle request"""
 	cmd = frappe.local.form_dict.cmd
 	data = None
@@ -39,7 +39,7 @@ def handle(args=[]):
 
 	return build_response("json")
 
-def execute_cmd(cmd, args=[], from_async=False):
+def execute_cmd(cmd, args=None, from_async=False):
 	"""execute a request as python module"""
 	for hook in frappe.get_hooks("override_whitelisted_methods", {}).get(cmd, []):
 		# override using the first hook
@@ -188,7 +188,7 @@ def upload_file():
 		return ret
 
 
-def get_attr(cmd, args=[]):
+def get_attr(cmd, args=None):
 	"""get method object from cmd"""
 	if '.' in cmd:
 		method = frappe.get_attr(cmd, args)
@@ -196,7 +196,3 @@ def get_attr(cmd, args=[]):
 		method = globals()[cmd]
 	frappe.log("method:" + cmd)
 	return method
-
-@frappe.whitelist(allow_guest = True)
-def ping():
-	return "pong"
