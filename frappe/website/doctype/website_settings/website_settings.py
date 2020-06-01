@@ -123,6 +123,8 @@ def get_website_settings():
 	return context
 
 def get_items(parentfield):
+	if frappe.session.user == 'Guest':
+		return []
 	all_top_items = frappe.db.sql("""\
 		select * from `tabTop Bar Item`
 		where parent='Website Settings' and parentfield= %s
