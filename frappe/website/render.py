@@ -35,6 +35,7 @@ def render(path=None, http_status_code=None):
 		path = resolve_path(path)
 		data = None
 
+
 		# if in list of already known 404s, send it
 		if can_cache() and frappe.cache().hget('website_404', frappe.request.url):
 			data = render_page('404')
@@ -43,6 +44,9 @@ def render(path=None, http_status_code=None):
 			return get_static_file_response()
 		elif is_web_form(path):
 			data = render_web_form(path)
+		elif is_method(path):
+			from frappe.handler import execute_cmd
+			data = execute_cmd(path)
 		else:
 			try:
 				data = render_page_by_language(path)
@@ -231,7 +235,7 @@ def resolve_path(path):
 def resolve_from_map(path):
 	m = Map([Rule(r["from_route"], endpoint=r["to_route"], defaults=r.get("defaults"))
 		for r in get_website_rules()])
-
+	print(get_website_rules())
 	if frappe.local.request:
 		urls = m.bind_to_environ(frappe.local.request.environ)
 	try:
@@ -331,7 +335,7 @@ def get_doctype_from_path(path):
 	return None, None
 
 def add_csrf_token(data):
-	if frappe.local.session:
+	if frappe.local.session and not isinstance(data, dict):
 		return data.replace("<!-- csrf_token -->", '<script>frappe.csrf_token = "{0}";</script>'.format(
 				frappe.local.session.data.csrf_token))
 	else:
@@ -350,3 +354,11 @@ def raise_if_disabled(path):
 		_path = r.route.lstrip('/')
 		if path == _path and not r.enabled:
 			raise frappe.PermissionError
+
+def is_method(path):
+	from frappe.handler import get_attr
+	try:
+		get_attr(path)
+		return True
+	except Exception:
+		return False
