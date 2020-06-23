@@ -21,6 +21,7 @@ from frappe.website.utils import (get_home_page, can_cache, delete_page_cache,
 from frappe.website.router import clear_sitemap
 from frappe.translate import guess_language
 
+
 class PageNotFoundError(Exception): pass
 
 def render(path=None, http_status_code=None):
@@ -46,6 +47,9 @@ def render(path=None, http_status_code=None):
 			data = render_web_form(path)
 		elif is_method(path):
 			from frappe.handler import execute_cmd
+			from frappe.api import validate_oauth, validate_auth_via_api_keys
+			validate_oauth()
+			validate_auth_via_api_keys()
 			data = execute_cmd(path)
 		else:
 			try:
@@ -235,7 +239,6 @@ def resolve_path(path):
 def resolve_from_map(path):
 	m = Map([Rule(r["from_route"], endpoint=r["to_route"], defaults=r.get("defaults"))
 		for r in get_website_rules()])
-	print(get_website_rules())
 	if frappe.local.request:
 		urls = m.bind_to_environ(frappe.local.request.environ)
 	try:
