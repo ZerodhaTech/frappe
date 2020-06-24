@@ -65,9 +65,8 @@ def application(request):
 		elif frappe.request.path.startswith('/private/files/'):
 			response = frappe.utils.response.download_private_file(request.path)
 
-		elif frappe.local.request.method in ('GET', 'HEAD', 'POST'):
+		elif frappe.local.request.method in ('GET', 'HEAD', 'POST', 'PUT', 'DELETE'):
 			response = frappe.website.render.render()
-
 		else:
 			raise NotFound
 
