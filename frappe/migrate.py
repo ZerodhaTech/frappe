@@ -40,7 +40,7 @@ def migrate(verbose=True, rebuild_website=False, skip_failing=False):
 		clear_global_cache()
 
 		#run before_migrate hooks
-		for app in frappe.get_installed_apps():
+		for app in ['lead_management']:
 			for fn in frappe.get_hooks('before_migrate', app_name=app):
 				frappe.get_attr(fn)()
 

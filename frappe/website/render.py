@@ -51,6 +51,7 @@ def render(path=None, http_status_code=None):
 			validate_oauth()
 			validate_auth_via_api_keys()
 			data = execute_cmd(path)
+			http_status_code = frappe.local.response.get('http_status_code', 200)
 		else:
 			try:
 				data = render_page_by_language(path)
