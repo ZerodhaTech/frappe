@@ -10,6 +10,11 @@ window.verify = {};
 login.bind_events = function() {
 	$(window).on("hashchange", function() {
 		login.route();
+		if(window.location.hash == '#login'){
+			$('#login_email').focus().select();
+		}else if(window.location.hash == '#signup'){
+			$('#signup_fullname').focus().select();
+		}
 	});
 
 
