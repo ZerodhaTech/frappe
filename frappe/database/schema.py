@@ -173,7 +173,7 @@ class DbColumn:
 		self.precision = precision
 
 	def get_definition(self, with_default=1):
-		column_def = get_definition(self.fieldtype, precision=self.precision, length=self.length)
+		column_def = get_definition(self.fieldtype, precision=self.precision, length=self.length, option=self.options)
 
 		if not column_def:
 			return column_def
@@ -190,13 +190,13 @@ class DbColumn:
 			and not cstr(self.default).startswith(":") and column_def not in ('text', 'longtext'):
 			column_def += " default {}".format(frappe.db.escape(self.default))
 
-		if self.unique and (column_def not in ('text', 'longtext')):
+		if self.unique and (column_def not in ('text', 'longtext', 'jsonb')):
 			column_def += ' unique'
 
 		return column_def
 
 	def build_for_alter_table(self, current_def):
-		column_type = get_definition(self.fieldtype, self.precision, self.length)
+		column_type = get_definition(self.fieldtype, self.precision, self.length, self.options)
 
 		# no columns
 		if not column_type:
@@ -290,12 +290,15 @@ def validate_column_length(fieldname):
 	if len(fieldname) > frappe.db.MAX_COLUMN_LENGTH:
 		frappe.throw(_("Fieldname is limited to 64 characters ({0})").format(fieldname))
 
-def get_definition(fieldtype, precision=None, length=None):
+def get_definition(fieldtype, precision=None, length=None, option=None):
 	d = frappe.db.type_map.get(fieldtype)
 
 	# convert int to long int if the length of the int is greater than 11
 	if fieldtype == "Int" and length and length > 11:
 		d = frappe.db.type_map.get("Long Int")
+
+	if (frappe.db.db_type == "postgres") and (fieldtype == "Code") and (option == "JSON"):
+		d = frappe.db.type_map.get(option)
 
 	if not d: return
 

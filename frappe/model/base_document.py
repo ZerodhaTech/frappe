@@ -2,6 +2,7 @@
 # License: MIT. See LICENSE
 import frappe
 import datetime
+import json
 from frappe import _
 from frappe.model import default_fields, table_fields
 from frappe.model.naming import set_new_name
@@ -743,6 +744,13 @@ class BaseDocument(object):
 			elif language == "PythonExpression":
 				frappe.utils.validate_python_code(code_string, fieldname=field.label)
 
+			elif (language == "JSON") and (code_string != "") :
+				try:
+					json.loads(code_string)
+				except (TypeError, ValueError) as err:
+					frappe.throw(frappe._("{}: Invalid json string.").format(field.label), title=frappe._("Syntax Error"))
+				except Exception as err:
+					frappe.throw(err, title=frappe._("Syntax Error"))
 
 	def throw_length_exceeded_error(self, df, max_length, value):
 		if self.parentfield and self.idx:

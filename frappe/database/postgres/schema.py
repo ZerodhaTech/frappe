@@ -51,7 +51,7 @@ class PostgresTable(DBTable):
 
 			query.append("ALTER COLUMN `{0}` TYPE {1} {2}".format(
 				col.fieldname,
-				get_definition(col.fieldtype, precision=col.precision, length=col.length),
+				get_definition(col.fieldtype, precision=col.precision, length=col.length, option=col.options),
 				using_clause)
 			)
 

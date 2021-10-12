@@ -152,6 +152,7 @@ frappe.ui.form.ControlCode = class ControlCode extends frappe.ui.form.ControlTex
 			if (!this.editor) return;
 			if (!value) value = '';
 			if (value === this.get_input_value()) return;
+			if (typeof value === 'object') value = JSON.stringify(value);
 			this.editor.session.setValue(value);
 		});
 	}
